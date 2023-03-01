@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use Illuminate\Http\Response;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -81,6 +82,11 @@ class AuthController extends Controller
         try {
             // data user login
             $user = $request->user();
+
+            #Update the new Password
+            User::whereId(auth()->user()->id)->update([
+                'password' => Hash::make($request->new_password)
+            ]);
             // deletes all tokens based on user login
             $token = $user->tokens()->where('tokenable_id', $user->id)->delete();
 
@@ -110,31 +116,17 @@ class AuthController extends Controller
 
     public function gantipassword(Request $request)
     {
-        $user = User::query()->where("id", $id)->first();
-        if (!isset($user)) {
-            return response()->json([
-                "status" => false,
-                "message" => "data kosong",
-                "data" => null
-            ]);
+        #Match The Old Password
+        if(!Hash::check($request->old_password, auth()->user()->password)){
+            return back()->with("error", "Wrong Old Password!");
         }
 
-        $payload = $request->all();
-
-        $user->fill($payload);
-        $user->save();
-
-        return response()->json([
-            "status" => true,
-            "message" => "perubahan data tersimpan",
-            "data" => $user
+        #Update the new Password
+        User::whereId(auth()->user()->id)->update([
+            'password' => Hash::make($request->new_password)
         ]);
-        //show which user
-        $user = $request->user();
-        $user->password;
-        return response()->json([
-            'success' => true,
-            'data'  => $user
-        ]);
+
+        return $this->responseSuccess(null, 'Password successfully updated!');
+
     }
 }
