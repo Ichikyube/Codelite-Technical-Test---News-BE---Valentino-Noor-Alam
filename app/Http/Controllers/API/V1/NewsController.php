@@ -80,8 +80,7 @@ class NewsController extends Controller
         if ($validated['banner']) {
             $banner = $request->file('banner');
             $imageName = date('YmdHis') . "." . $banner->getClientOriginalName();
-            $banner->move(public_path('img'),$imageName);
-            $path =  $request->getSchemeAndHttpHost() ."/img/" . $imageName;
+            $path =  $request->getSchemeAndHttpHost() . '/' . $banner->storeAs('img',$imageName);
             $validated['banner'] = $path;
             
         } else
