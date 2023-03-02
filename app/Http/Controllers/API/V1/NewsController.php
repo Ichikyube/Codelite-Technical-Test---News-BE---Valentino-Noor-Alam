@@ -65,7 +65,7 @@ class NewsController extends Controller
         try {
             $validated = $request->validate([
                 'title' => ['required'],
-                'banner' => ['mimes:jpg,jpeg,png'],
+                'banner' => ['required'],
                 'content' => ['required'],
             ]);
         } catch (\Illuminate\Validation\ValidationException $th) {
@@ -83,7 +83,6 @@ class NewsController extends Controller
             $imageName = date('YmdHis') . "." . $banner->getClientOriginalName();
             $path =  $request->getSchemeAndHttpHost() . '/storage/' . $banner->storeAs('img',$imageName);
             $validated['banner'] = $path;
-            
         } else
         {
             return response()->json([
