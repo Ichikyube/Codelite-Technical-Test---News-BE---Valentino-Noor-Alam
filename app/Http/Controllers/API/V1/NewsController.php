@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\HttpResponses;
 use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class NewsController extends Controller
 {
@@ -80,7 +81,7 @@ class NewsController extends Controller
         if ($validated['banner']) {
             $banner = $request->file('banner');
             $imageName = date('YmdHis') . "." . $banner->getClientOriginalName();
-            $path =  $request->getSchemeAndHttpHost() . '/storage' . '/' . $banner->storeAs('img',$imageName);
+            $path =  $request->getSchemeAndHttpHost() . '/storage/' . $banner->storeAs('img',$imageName);
             $validated['banner'] = $path;
             
         } else
@@ -121,7 +122,7 @@ class NewsController extends Controller
      * @param  \App\Models\News  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id):JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -180,7 +181,8 @@ class NewsController extends Controller
      * @param  \App\Models\News  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id){
+    public function destroy(Request $request, $id):JsonResponse
+    {
         try {
             $post = News::query()
             ->where("id", $id);
