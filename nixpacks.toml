@@ -1,0 +1,2 @@
+[phases.setup]
+nixPkgs = ['php81', 'perl', 'nginx', 'php81Packages.composer', 'nodejs-16_x', 'npm-8_x', 'daemon', 'postgresql', 'mimeo']
