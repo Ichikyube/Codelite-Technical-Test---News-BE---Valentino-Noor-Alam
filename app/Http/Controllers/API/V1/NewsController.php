@@ -180,7 +180,7 @@ class NewsController extends Controller
      * @param  \App\Models\News  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id):JsonResponse
+    public function destroy($request, $id):JsonResponse
     {
         try {
             $post = News::query()
