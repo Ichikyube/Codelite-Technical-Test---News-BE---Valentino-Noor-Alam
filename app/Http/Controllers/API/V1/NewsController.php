@@ -81,7 +81,7 @@ class NewsController extends Controller
         if ($validated['banner']) {
             $banner = $request->file('banner');
             $imageName = date('YmdHis') . "." . $banner->getClientOriginalName();
-            $path =  $request->getSchemeAndHttpHost() . '/storage/' . $banner->storeAs('img',$imageName);
+            $path =  $request->getSchemeAndHttpHost() . '/' . $banner->storeAs('images',$imageName);
             $validated['banner'] = $path;
         } else
         {
