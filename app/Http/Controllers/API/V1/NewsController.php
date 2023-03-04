@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Helpers\UploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\News;
+use App\Repositories\NewsRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
@@ -19,13 +21,25 @@ class NewsController extends Controller
      */
     use HttpResponses;
 
+
+    /**
+     * Product Repository class.
+     *
+     * @var ProductRepository
+     */
+    public $newsRepository;
+
+    public function __construct(NewsRepository $newsRepository)
+    {
+        $this->newsRepository = $newsRepository;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         try {
-            $data = News::latest()->get();
+            $data = $this->newsRepository->getAll();
             return $this->responseSuccess($data, 'News List Fetch Successfully !');
         } catch (\Exception $e) {
             return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -49,8 +63,8 @@ class NewsController extends Controller
     public function search(Request $request)
     {
         try {
-            //$data = $this->newsRepository->searchNews($request->search, $request->perPage);
-            //return $this->responseSuccess($data, 'News List Fetched Successfully !');
+            $data = $this->newsRepository->searchNews($request->search, $request->perPage);
+            return $this->responseSuccess($data, 'News List Fetched Successfully !');
         } catch (\Exception $e) {
             return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -61,48 +75,14 @@ class NewsController extends Controller
     */
     public function store(Request $request) 
     {
-
-        $validated = $request->all();
-        // trim title and convert it to title case
-        $validated['title'] = Str::of($validated['title'])->trim()->title();
-
-        if ($validated['banner']) {
-            $banner = $request->file('banner');
-            $imageName = date('YmdHis') . "." . $banner->getClientOriginalName();
-            $path =  $request->getSchemeAndHttpHost() . '/' . $banner->storeAs('images',$imageName);
-            $validated['banner'] = $path;
-        } else
-        {
-            return response()->json([
-                'status' => false,
-                'message' => 'Your source is not valid',
-                'data' => null
-            ], 403);
+        try {
+            $article = $this->newsRepository->create($request);
+            return $this->responseSuccess($article, 'New Article Created Successfully !');
+        } catch (\Exception $exception) {
+            return $this->responseError(null, $exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
-        $article = News::create($validated);
-        return $this->responseSuccess($article, 'New Article Created Successfully !');
     }
 
-    public function edit($id)
-    {
-        $article = News::query()
-        ->where("id", $id)
-        ->first();
-
-        if (!isset($article)) {
-            return response()->json([
-                "status" => false,
-                "message" => "no data",
-                "data" => null
-            ]);
-        }
-
-        return response()->json([
-            "status" => true,
-            "data" => $article
-        ]);
-    }
     /**
      *
      * @param  \Illuminate\Http\Request  $request
@@ -158,7 +138,29 @@ class NewsController extends Controller
         }catch (\Exception $e) {
             return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
+    }
+    public function edit($id)
+    {
+        try {
+            $article = News::query()
+            ->where("id", $id)
+            ->first();
+
+            if (!isset($article)) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "no data",
+                    "data" => null
+                ]);
+            }
+    
+            return response()->json([
+                "status" => true,
+                "data" => $article
+            ]);
+        } catch (\Exception $exception) {
+            return $this->responseError(null, $exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
         
 

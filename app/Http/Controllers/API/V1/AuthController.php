@@ -17,6 +17,9 @@ class AuthController extends Controller
      * Response trait to handle return responses.
      */
     use HttpResponses;
+
+
+    
     /**
      * @OA\POST(
      *     path="/api/login",
