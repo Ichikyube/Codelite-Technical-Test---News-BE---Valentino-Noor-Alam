@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use App\Traits\HttpResponses;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -62,19 +61,8 @@ class NewsController extends Controller
     */
     public function store(Request $request) 
     {
-        try {
-            $validated = $request->validate([
-                'title' => ['required'],
-                'banner' => ['required'],
-                'content' => ['required'],
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->validator->errors()
-            ], 403);
-        }
-        
+
+        $validated = $request->all();
         // trim title and convert it to title case
         $validated['title'] = Str::of($validated['title'])->trim()->title();
 
