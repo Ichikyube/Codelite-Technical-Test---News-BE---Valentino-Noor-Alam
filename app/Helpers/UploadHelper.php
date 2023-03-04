@@ -44,19 +44,29 @@ class UploadHelper
    * @param  string $old_location    file location which will delete
    * @return string                  filename
    */
-  public static function update($f, $file, $name, $target_location, $old_location)
+  public static function update($f, $file, $name, $base_path, $target_location, $old_location)
   {
-    //delete the old file
-    $target_location = $target_location . '/';
-    if (Storage::exists($target_location . $old_location)) {
-      Storage::delete($target_location . $old_location);
+    if ($f) {
+      //delete the old file
+      $target_location = $target_location . '/';
+      if (Storage::exists($target_location . $old_location)) {
+        Storage::delete($target_location . $old_location);
+      }
+
+      $filename = $name . '.' . $file->getClientOriginalExtension();
+      $file->move($target_location, $filename);
+      $filename = date('YmdHis') . '-' . $name . '-' . $file->getClientOriginalExtension();
+      $path =  $base_path . $file->storeAs($target_location,$filename);
+      return $path;
+    } else
+    {
+        return response()->json([
+            'status' => false,
+            'message' => 'Your source is not valid',
+            'data' => null
+        ], 403);
     }
-
-    $filename = $name . '.' . $file->getClientOriginalExtension();
-    $file->move($target_location, $filename);
-    return $filename;
   }
-
 
   /**
    * delete file

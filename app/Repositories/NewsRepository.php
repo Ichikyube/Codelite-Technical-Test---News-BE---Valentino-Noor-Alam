@@ -99,7 +99,8 @@ class NewsRepository implements CrudInterface
 
         // If everything is OK, then update.
         $news->update($data);
-
+        //$news->fill($data);
+        //$news->save();
         // Finally return the updated product.
         return $this->getByID($news->id);
     }
