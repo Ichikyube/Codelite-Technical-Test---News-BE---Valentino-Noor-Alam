@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Repositories\AuthRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
@@ -17,86 +18,89 @@ class AuthController extends Controller
      * Response trait to handle return responses.
      */
     use HttpResponses;
+    public $authRepository;
 
-
-    
     /**
-     * @OA\POST(
-     *     path="/api/login",
-     *     tags={"Authentication"},
-     *     summary="Login",
-     *     description="Login",
-     *     @OA\RequestBody(
-     *          @OA\JsonContent(
-     *              type="object",
-     *              @OA\Property(property="email", type="string", example="admin@example.com"),
-     *              @OA\Property(property="password", type="string", example="123456")
-     *          ),
-     *      ),
-     *      @OA\Response(response=200, description="Login"),
-     *      @OA\Response(response=400, description="Bad request"),
-     *      @OA\Response(response=404, description="Resource Not Found")
-     * )
+     * Create a new AuthController instance.
+     *
+     * @return void
      */
-    function login(Request $request) 
+    public function __construct(AuthRepository $authRepository)
     {
-        //validation data form request body
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        $this->authRepository = $authRepository;
+    }
 
-        //try and catch, hendle error message
+    /**
+     *     @OA\Response(response=200, description="Success" ),
+     *     @OA\Response(response=400, description="Bad request"),
+     *     @OA\Response(response=404, description="Resource Not Found"),
+    */
+    
+    public function register(Request $request)
+    {
         try {
-            // fetch user data from database based on request(email)
-            $user = User::where('email', $request->email)->first();
-            // cek user berdasarkan email (availability user)
-            if ($user == null) {
-                return response()->json([
-                    "success" => false,
-                    "message" => "email tidak ditemukan",
-                    "data" => null
-                ]);
+            $requestData = $request->only('name', 'email', 'password', 'password_confirmation');
+            $user = $this->authRepository->register($requestData);
+            if ($user) {
+                if ($token = $user->attempt($requestData)) {
+                    $data =  $this->respondWithToken($token);
+                    return $this->responseSuccess($data, 'User Registered and Logged in Successfully', Response::HTTP_OK);
+                }
             }
-            // check user login data
-            if (Auth::attempt($credentials)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Login Failed, Invalid Email and Password!'
-                ], Response::HTTP_UNAUTHORIZED);
-            }
-            // create new token
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            // response success
-            return response()->json([
-                'success' => true,
-                'message' => 'Logged In Successfully !',
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $user
-            ], 200);
         } catch (\Exception $e) {
             return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    public function login(Request $request) 
+    {
+        try {
+            $credentials = $request->validate([
+                'email' => ['required', 'email'],
+                'password' => ['required'],
+            ]);
+            // fetch user data from database based on request(email)
+            $user = User::query()
+                ->where("email", $credentials['email'])
+                ->firstOr(fn() => response()->json([
+                    "success" => false,
+                    "message" => "email is not registered",
+                    "data" => null
+                ]));
+            // check user login data
+            if ($credentials['password'] == $user->password) {
+                // create new token
+                $token = $user->createToken('auth_token')->plainTextToken;
 
-    function logout(Request $request) {
+                // response success
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Logged In Successfully !',
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'user' => $user
+                ], 200);
+
+            } 
+            return response()->json([
+                'success' => false,
+                'message' => 'Login Failed, Invalid Email and Password!'
+            ], Response::HTTP_UNAUTHORIZED);
+        } catch (\Exception $e) {
+            return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }            
+
+    public function logout(Request $request) {
         try {
             // data user login
             $user = $request->user();
-
-            #Update the new Password
-            User::whereId(auth()->user()->id)->update([
-                'password' => Hash::make($request->new_password)
-            ]);
             // deletes all tokens based on user login
             $token = $user->tokens()->where('tokenable_id', $user->id)->delete();
 
             // response success
             return response()->json([
                 'success'           => true,
-                'massage'           => 'Logged out successfully !',
+                'message'           => 'Logged out successfully !',
                 'tokenOnDeleted'    => $token,
             ], 200);
 
@@ -109,12 +113,12 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        //show which user
-        $user = $request->user();
-        return response()->json([
-            'success' => true,
-            'data'  => $user
-        ]);
+        try {
+            $user = $request->user();
+            return $this->responseSuccess($user, 'Profile Fetched Successfully !');
+        } catch (\Exception $e) {
+            return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     public function gantipassword(Request $request)
@@ -123,7 +127,6 @@ class AuthController extends Controller
         if(!Hash::check($request->old_password, auth()->user()->password)){
             return back()->with("error", "Wrong Old Password!");
         }
-
         #Update the new Password
         User::whereId(auth()->user()->id)->update([
             'password' => Hash::make($request->new_password)

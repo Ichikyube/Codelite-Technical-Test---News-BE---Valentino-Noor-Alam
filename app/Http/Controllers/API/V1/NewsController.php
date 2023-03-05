@@ -46,20 +46,6 @@ class NewsController extends Controller
         }
     }    
     
-    /**
-     * @OA\GET(
-     *     path="/api/news/view/search",
-     *     tags={"Newss"},
-     *     summary="All Newss - Publicly Accessible",
-     *     description="All Newss - Publicly Accessible",
-     *     operationId="search",
-     *     @OA\Parameter(name="perPage", description="perPage, eg; 20", example=20, in="query", @OA\Schema(type="integer")),
-     *     @OA\Parameter(name="search", description="search, eg; Test", example="Test", in="query", @OA\Schema(type="string")),
-     *     @OA\Response(response=200, description="All Newss - Publicly Accessible" ),
-     *     @OA\Response(response=400, description="Bad request"),
-     *     @OA\Response(response=404, description="Resource Not Found"),
-     * )
-     */
     public function search(Request $request)
     {
         try {

@@ -19,14 +19,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
-Route::post('/login',[AuthController::class, 'login'])->name('userLogin');
+Route::post('/register',[AuthController::class, 'register'])->name('register');
+Route::post('/login',[AuthController::class, 'login'])->name('login');
 Route::get('/me', [AuthController::class, 'me'])->middleware("auth:sanctum");
 Route::get('/logout',[AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::get('/gantipassword/{token}',[AuthController::class, 'gantipassword'])->name('newpassword');
 
 Route::get('/', [NewsController::class,'index']);
-Route::prefix('news')->controller(NewsController::class)
+Route::prefix('news')
+    ->controller(NewsController::class)
     ->middleware('auth:sanctum')
     ->group(function(){
     Route::post('/post', 'store');
