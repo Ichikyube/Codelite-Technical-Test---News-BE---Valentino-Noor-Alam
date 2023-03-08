@@ -17,6 +17,15 @@ class NewsRepository implements CrudInterface
     public News | null $news;
 
     /**
+     * __construct.
+     *
+     * @param  Model|Builder  $model
+     */
+    public function __construct(News $news)
+    {
+        $this->news = $news;
+    }
+    /**
      * Get All Newss.
      *
      * @return collections Array of News Collection
