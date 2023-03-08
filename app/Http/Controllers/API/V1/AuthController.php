@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Repositories\AuthRepository;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\Auth\LoginRequest;
