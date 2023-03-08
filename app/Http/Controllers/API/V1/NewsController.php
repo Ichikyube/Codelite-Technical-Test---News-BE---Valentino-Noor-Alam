@@ -18,7 +18,6 @@ class NewsController extends Controller
      */
     use HttpResponses;
 
-
     /**
      * Product Repository class.
      *
