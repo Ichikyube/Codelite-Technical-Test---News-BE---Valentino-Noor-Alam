@@ -54,10 +54,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         try {
-            $credentials = $request->validate([
-                'email' => ['required', 'email'],
-                'password' => ['required'],
-            ]);
+            $credentials = $request->validate();
             // fetch user data from database based on request(email)
             $user = User::query()
                 ->where("email", $credentials['email'])
