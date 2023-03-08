@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Traits\HttpResponses;
 use Illuminate\Http\Response;
 use App\Models\User;
@@ -35,8 +37,8 @@ class AuthController extends Controller
      *     @OA\Response(response=400, description="Bad request"),
      *     @OA\Response(response=404, description="Resource Not Found"),
     */
-    
-    public function register(Request $request)
+
+    public function register(RegisterRequest $request)
     {
         try {
             $requestData = $request->only('name', 'email', 'password', 'password_confirmation');
@@ -51,7 +53,7 @@ class AuthController extends Controller
             return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    public function login(Request $request) 
+    public function login(LoginRequest $request)
     {
         try {
             $credentials = $request->validate([
@@ -80,7 +82,7 @@ class AuthController extends Controller
                     'user' => $user
                 ], 200);
 
-            } 
+            }
             return response()->json([
                 'success' => false,
                 'message' => 'Login Failed, Invalid Email and Password!'
@@ -88,7 +90,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }            
+    }
 
     public function logout(Request $request) {
         try {

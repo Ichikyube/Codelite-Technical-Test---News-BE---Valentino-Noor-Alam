@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\ArticleStoreRequest;
 
 interface CrudInterface
 {
@@ -13,7 +13,7 @@ interface CrudInterface
     public function getPaginatedData(int $perPage);
 
 
-    public function create(Request $request);
+    public function create(ArticleStoreRequest $request);
 
 
     public function delete(int $id);
@@ -22,5 +22,5 @@ interface CrudInterface
     public function getByID(int $id);
 
 
-    public function update(int $id, Request $request);
+    public function update(int $id, ArticleStoreRequest $request);
 }

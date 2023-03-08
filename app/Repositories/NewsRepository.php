@@ -7,7 +7,7 @@ use App\Helpers\UploadHelper;
 use App\Interfaces\CrudInterface;
 use App\Models\News;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Http\Request;
+use App\Http\Requests\ArticleStoreRequest;
 
 class NewsRepository implements CrudInterface
 {
@@ -64,9 +64,9 @@ class NewsRepository implements CrudInterface
      * @param array $data
      * @return object News Object
      */
-    public function create(Request $request): News
+    public function create(ArticleStoreRequest $request): News
     {
-        $data = $request->all();
+        $data = $request->validate();
         $data['title'] = Str::of($data['title'])->trim()->title();// trim title and convert it to title case
 
         if (!empty($data['banner'])) {
@@ -83,9 +83,10 @@ class NewsRepository implements CrudInterface
      * @param array $data
      * @return object Updated News Object
      */
-    public function update(int $id, Request $request): News|null
+    public function update(int $id, ArticleStoreRequest $request): News|null
     {
-        $data = $request->all();
+        $data = $request->validate();
+        //$news = News::where("id", $id)->firstOrFail();
         $news = News::find($id);
         if (is_null($news)) {
             return null;
@@ -99,8 +100,6 @@ class NewsRepository implements CrudInterface
 
         // If everything is OK, then update.
         $news->update($data);
-        //$news->fill($data);
-        //$news->save();
         // Finally return the updated product.
         return $this->getByID($news->id);
     }

@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\API\V1;
 
-use App\Helpers\UploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\News;
 use App\Repositories\NewsRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Storage;
 use App\Traits\HttpResponses;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -44,8 +41,8 @@ class NewsController extends Controller
         } catch (\Exception $e) {
             return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }    
-    
+    }
+
     public function search(Request $request)
     {
         try {
@@ -59,7 +56,7 @@ class NewsController extends Controller
     /**
     * Store a newly created resource in storage.
     */
-    public function store(Request $request) 
+    public function store(Request $request)
     {
         try {
             $article = $this->newsRepository->create($request);
@@ -77,9 +74,9 @@ class NewsController extends Controller
      */
     public function update(Request $request, $id):JsonResponse
     {
-
+        $validated = $request->validate();
         try {
-            $article = $this->newsRepository->update($id,$request);
+            $article = $this->newsRepository->update($id,$validated);
             return $this->responseSuccess($article, 'Article Updated Successfully !');
         }catch (\Exception $e) {
             return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -99,7 +96,7 @@ class NewsController extends Controller
                     "data" => null
                 ]);
             }
-    
+
             return response()->json([
                 "status" => true,
                 "data" => $article
@@ -108,7 +105,7 @@ class NewsController extends Controller
             return $this->responseError(null, $exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-        
+
 
     /**
      * Remove the specified resource from storage.
