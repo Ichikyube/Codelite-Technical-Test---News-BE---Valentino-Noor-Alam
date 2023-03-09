@@ -42,15 +42,15 @@ class NewsController extends Controller
         }
     }
 
-    public function search(Request $request)
-    {
-        try {
-            $data = $this->newsRepository->searchNews($request->search, $request->perPage);
-            return $this->responseSuccess($data, 'News List Fetched Successfully !');
-        } catch (\Exception $e) {
-            return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
+    // public function search(Request $request)
+    // {
+    //     try {
+    //         $data = $this->newsRepository->searchNews($request->search, $request->perPage);
+    //         return $this->responseSuccess($data, 'News List Fetched Successfully !');
+    //     } catch (\Exception $e) {
+    //         return $this->responseError(null, $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
     /**
     * Store a newly created resource in storage.
