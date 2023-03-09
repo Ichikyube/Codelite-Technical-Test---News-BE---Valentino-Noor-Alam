@@ -30,11 +30,10 @@ class NewsRepository implements CrudInterface
      *
      * @return collections Array of News Collection
      */
-    public function getAll(): Paginator
+    public function getAll()
     {
         return $this->news
-            ->latest()
-            ->paginate(10);
+            ->latest();
     }
 
     /**
@@ -46,7 +45,8 @@ class NewsRepository implements CrudInterface
     public function getPaginatedData($perPage): Paginator
     {
         $perPage = isset($perPage) ? intval($perPage) : 12;
-        return News::latest()
+        return $this->news
+            ->latest()
             ->paginate($perPage);
     }
 
