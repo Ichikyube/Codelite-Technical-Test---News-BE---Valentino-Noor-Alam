@@ -10,7 +10,7 @@ interface CrudInterface
     public function getAll();
 
 
-    public function getPaginatedData(int $perPage);
+    // public function getPaginatedData(int $perPage);
 
 
     public function create(ArticleStoreRequest $request);

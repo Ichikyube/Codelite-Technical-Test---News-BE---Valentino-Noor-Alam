@@ -42,13 +42,13 @@ class NewsRepository implements CrudInterface
      * @param int $pageNo
      * @return collections Array of News Collection
      */
-    public function getPaginatedData($perPage): Paginator
-    {
-        $perPage = isset($perPage) ? intval($perPage) : 12;
-        return $this->news
-            ->latest()
-            ->paginate($perPage);
-    }
+    // public function getPaginatedData($perPage): Paginator
+    // {
+    //     $perPage = isset($perPage) ? intval($perPage) : 12;
+    //     return $this->news
+    //         ->latest()
+    //         ->paginate($perPage);
+    // }
 
     /**
      * Get Searchable News Data with Pagination.
@@ -56,16 +56,16 @@ class NewsRepository implements CrudInterface
      * @param int $pageNo
      * @return collections Array of News Collection
      */
-    public function searchNews($keyword, $perPage): Paginator
-    {
-        $perPage = isset($perPage) ? intval($perPage) : 10;
+    // public function searchNews($keyword, $perPage): Paginator
+    // {
+    //     $perPage = isset($perPage) ? intval($perPage) : 10;
 
-        return News::where('title', 'like', '%' . $keyword . '%')
-            ->orWhere('content', 'like', '%' . $keyword . '%')
-            ->orWhere('banner', 'like', '%' . $keyword . '%')
-            ->orderBy('id', 'desc')
-            ->paginate($perPage);
-    }
+    //     return News::where('title', 'like', '%' . $keyword . '%')
+    //         ->orWhere('content', 'like', '%' . $keyword . '%')
+    //         ->orWhere('banner', 'like', '%' . $keyword . '%')
+    //         ->orderBy('id', 'desc')
+    //         ->paginate($perPage);
+    // }
 
     /**
      * Create New News.
